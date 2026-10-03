@@ -1,10 +1,11 @@
-import { Product, Evaluation, Campaign, ProductStats, GlobalStats, PriceBin, EmailInvitation, InvitationBatch } from './types';
+import { Product, Evaluation, ProductInterest, Campaign, ProductStats, GlobalStats, PriceBin, EmailInvitation, InvitationBatch } from './types';
 import { translateFrenchToAr } from './translator';
 
 interface StoreData {
   campaigns: Campaign[];
   products: Product[];
   evaluations: Evaluation[];
+  interests?: ProductInterest[];
   invitations?: EmailInvitation[];
   invitationBatches?: InvitationBatch[];
   socialLinks?: { whatsapp: string; telegram: string };
@@ -247,6 +248,7 @@ async function ensureStore(): Promise<StoreData> {
     campaigns: INITIAL_CAMPAIGNS,
     products: INITIAL_PRODUCTS,
     evaluations: [],
+    interests: [],
     socialLinks: { whatsapp: '', telegram: '' },
     baselineStats: BASELINE_STATS,
   };
@@ -422,6 +424,7 @@ export async function deleteCampaign(id: string): Promise<{ success: boolean; er
   // Remove associated products, evaluations, invitations for this deleted campaign
   store.products = store.products.filter((p) => p.campaignId !== id);
   store.evaluations = store.evaluations.filter((e) => e.campaignId !== id);
+  store.interests = (store.interests || []).filter((interest) => interest.campaignId !== id);
   if (store.invitations) {
     store.invitations = store.invitations.filter((i) => i.campaignId !== id);
   }
@@ -516,11 +519,37 @@ export async function deleteProduct(id: string): Promise<boolean> {
   const initialCount = store.products.length;
   store.products = store.products.filter((p) => p.id !== id);
   store.evaluations = store.evaluations.filter((e) => e.productId !== id);
+  store.interests = (store.interests || []).filter((interest) => interest.productId !== id);
   if (store.products.length !== initialCount) {
     await saveStore(store);
     return true;
   }
   return false;
+}
+
+export async function addProductInterest(item: {
+  campaignId: string;
+  productId: string;
+  participantSessionId: string;
+}): Promise<{ created: boolean }> {
+  const store = await ensureStore();
+  store.interests ||= [];
+  const alreadyExists = store.interests.some((interest) =>
+    interest.campaignId === item.campaignId
+    && interest.productId === item.productId
+    && interest.participantSessionId === item.participantSessionId
+  );
+  if (alreadyExists) return { created: false };
+
+  store.interests.push({
+    id: `interest-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    campaignId: item.campaignId,
+    productId: item.productId,
+    participantSessionId: item.participantSessionId,
+    createdAt: new Date().toISOString(),
+  });
+  await saveStore(store);
+  return { created: true };
 }
 
 export async function getEvaluations(campaignId?: string, productId?: string): Promise<Evaluation[]> {
@@ -743,6 +772,7 @@ export async function calculateProductStats(campaignId?: string): Promise<Produc
       images: prod.images,
       videoUrl: prod.videoUrl,
       participants: totalParticipants,
+      interestedCount: (store.interests || []).filter((interest) => interest.productId === prod.id && interest.campaignId === targetCampaignId).length,
       avgRating: avgRating || 4.0,
       criteriaAvg,
       priceAvg: finalPriceAvg,
@@ -893,6 +923,7 @@ export async function resetToSeedData() {
     campaigns: INITIAL_CAMPAIGNS,
     products: INITIAL_PRODUCTS,
     evaluations: [],
+    interests: [],
     invitations: [],
     invitationBatches: [],
     baselineStats: BASELINE_STATS,

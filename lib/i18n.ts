@@ -33,6 +33,10 @@ export interface Translations {
   estimatedPrice: string;
   validateProduct: string;
   productValidated: string;
+  markInterested: string;
+  interestRecorded: string;
+  interestSaveError: string;
+  interestedCount: string;
   savingInProgress: string;
   doubleClickZoom: string;
   mediaCountInfo: string;
@@ -103,6 +107,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     validateProduct: 'Valider ce produit',
     productValidated: 'Produit validé ✓',
     savingInProgress: 'Enregistrement en cours...',
+    markInterested: 'Ce produit m’intéresse',
+    interestRecorded: 'Votre intérêt est enregistré',
+    interestSaveError: 'Impossible d’enregistrer votre intérêt. Réessayez.',
+    interestedCount: 'Intéressés',
     doubleClickZoom: 'Double-cliquez pour zoomer',
     mediaCountInfo: '3 photos & 1 vidéo disponibles',
     fullscreen: 'Plein écran',
@@ -193,6 +201,10 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     validateProduct: 'تأكيد تقييم هذا المنتج',
     productValidated: 'تم حفظ التقييم بنجاح ✓',
     savingInProgress: 'جاري الحفظ الآن...',
+    markInterested: 'هذا المنتج يهمني',
+    interestRecorded: 'تم تسجيل اهتمامكم',
+    interestSaveError: 'تعذر تسجيل اهتمامكم. حاولوا مرة أخرى.',
+    interestedCount: 'المهتمون',
     doubleClickZoom: 'انقر مرتين للتكبير',
     mediaCountInfo: '3 صور وفيديو متوفر للمعاينة',
     fullscreen: 'ملء الشاشة',

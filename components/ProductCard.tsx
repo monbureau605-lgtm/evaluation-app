@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Star, CheckCircle, Search, AlertCircle, Loader2, Play, Film, ChevronDown, ChevronUp, Sliders } from 'lucide-react';
+import { Star, CheckCircle, Search, AlertCircle, Loader2, Play, Film, ChevronDown, ChevronUp, Sliders, Heart } from 'lucide-react';
 import { Product } from '@/lib/types';
 import { Language, getTranslation } from '@/lib/i18n';
 
@@ -11,6 +11,7 @@ interface ProductCardProps {
   initialRating?: number;
   initialPrice?: number | string;
   isValidated?: boolean;
+  participantSessionId: string;
   lang?: Language;
   onValidate: (data: {
     productId: string;
@@ -32,6 +33,7 @@ export default function ProductCard({
   initialRating = 0,
   initialPrice = '',
   isValidated = false,
+  participantSessionId,
   lang = 'fr',
   onValidate,
   onOpenZoom,
@@ -54,12 +56,40 @@ export default function ProductCard({
   const [validated, setValidated] = useState(isValidated);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [interested, setInterested] = useState(false);
+  const [isSavingInterest, setIsSavingInterest] = useState(false);
+  const [interestError, setInterestError] = useState(false);
 
   const images = product.images && product.images.length > 0
     ? product.images.slice(0, 3)
     : ['https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&h=800&fit=crop'];
 
   const hasVideo = Boolean(product.videoUrl && product.videoUrl.trim() !== '');
+
+  const handleInterested = async () => {
+    if (interested || isSavingInterest) return;
+    setIsSavingInterest(true);
+    setInterestError(false);
+    try {
+      const response = await fetch('/api/interests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: product.id,
+          campaignId: product.campaignId,
+          participantSessionId,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error('Interest save failed');
+      setInterested(true);
+    } catch (error) {
+      console.error(error);
+      setInterestError(true);
+    } finally {
+      setIsSavingInterest(false);
+    }
+  };
 
   const handleRatingClick = (star: number) => {
     if (validated) return;
@@ -302,6 +332,21 @@ export default function ProductCard({
         <p className="mt-1.5 text-xs text-slate-600 dark:text-slate-300 line-clamp-2 min-h-[32px]">
           {product.description}
         </p>
+
+        <button
+          type="button"
+          onClick={handleInterested}
+          disabled={interested || isSavingInterest}
+          aria-pressed={interested}
+          className={`mt-3 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition ${interested
+            ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-300'
+            : 'border-rose-200 bg-white text-rose-600 hover:bg-rose-50 active:scale-[0.99] dark:border-rose-900/60 dark:bg-slate-900 dark:text-rose-300 dark:hover:bg-rose-950/30'
+          } disabled:cursor-default`}
+        >
+          {isSavingInterest ? <Loader2 className="h-4 w-4 animate-spin" /> : <Heart className={`h-4 w-4 ${interested ? 'fill-current' : ''}`} />}
+          {interested ? t.interestRecorded : isSavingInterest ? t.savingInProgress : t.markInterested}
+        </button>
+        {interestError && <p role="alert" className="mt-1 text-center text-[11px] font-medium text-red-600 dark:text-red-400">{t.interestSaveError}</p>}
 
         {/* Inputs Section */}
         <div className="mt-4 space-y-3.5 rounded-2xl bg-slate-50/90 dark:bg-slate-800/50 p-3.5 border border-slate-100 dark:border-slate-800">

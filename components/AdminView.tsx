@@ -1051,6 +1051,7 @@ export default function AdminView({
                       <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold uppercase tracking-wider text-slate-500">
                         <th className="px-6 py-3.5">Produit</th>
                         <th className="px-6 py-3.5 text-right">Participants</th>
+                        <th className="px-6 py-3.5 text-right">{t.interestedCount}</th>
                         <th className="px-6 py-3.5 text-right">Note moyenne</th>
                         <th className="px-6 py-3.5 text-right">Prix moyen</th>
                         <th className="px-6 py-3.5 text-right">Prix médian</th>
@@ -1089,6 +1090,11 @@ export default function AdminView({
                             </td>
                             <td className="px-6 py-4 text-right font-medium text-slate-600">
                               {stat.participants}
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <span className="inline-flex min-w-10 items-center justify-center rounded-lg bg-rose-50 px-2 py-1 text-xs font-bold text-rose-700 border border-rose-200">
+                                {stat.interestedCount}
+                              </span>
                             </td>
                             <td className="px-6 py-4 text-right">
                               <span className="inline-flex items-center gap-1 rounded-lg bg-amber-50 px-2 py-1 text-xs font-bold text-amber-700 border border-amber-200">

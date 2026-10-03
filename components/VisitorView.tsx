@@ -499,6 +499,7 @@ export default function VisitorView({
                   product={product}
                   currency={campaign?.currency || 'MAD'}
                   isValidated={isValidated}
+                  participantSessionId={visitorId}
                   initialRating={userEval?.rating || 0}
                   initialPrice={userEval?.price || ''}
                   lang={lang}

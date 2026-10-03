@@ -28,6 +28,14 @@ export interface Evaluation {
   createdAt: string;
 }
 
+export interface ProductInterest {
+  id: string;
+  campaignId: string;
+  productId: string;
+  participantSessionId: string;
+  createdAt: string;
+}
+
 export interface Campaign {
   id: string;
   title: string;
@@ -58,6 +66,7 @@ export interface ProductStats {
   images: string[];
   videoUrl?: string;
   participants: number;
+  interestedCount: number;
   avgRating: number;
   criteriaAvg?: EvaluationCriteria;
   priceAvg: number;
