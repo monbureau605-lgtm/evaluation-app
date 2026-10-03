@@ -17,6 +17,12 @@ function normalizeInviteUrl(value: unknown, service: 'whatsapp' | 'telegram'): s
   }
 }
 
+function normalizeWhatsAppNumber(value: unknown): string | null {
+  if (typeof value !== 'string' || value.trim() === '') return '';
+  const digits = value.replace(/\D/g, '');
+  return digits.length >= 8 && digits.length <= 15 ? digits : null;
+}
+
 export async function GET() {
   try {
     return NextResponse.json({ success: true, socialLinks: await getSocialLinks() });
@@ -33,10 +39,11 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const whatsapp = normalizeInviteUrl(body.whatsapp, 'whatsapp');
     const telegram = normalizeInviteUrl(body.telegram, 'telegram');
-    if (whatsapp === null || telegram === null) {
-      return NextResponse.json({ success: false, error: 'Utilisez un lien HTTPS WhatsApp ou Telegram valide.' }, { status: 400 });
+    const whatsappContactNumber = normalizeWhatsAppNumber(body.whatsappContactNumber);
+    if (whatsapp === null || telegram === null || whatsappContactNumber === null) {
+      return NextResponse.json({ success: false, error: 'Vérifiez les liens HTTPS et le numéro WhatsApp au format international.' }, { status: 400 });
     }
-    const socialLinks = await updateSocialLinks({ whatsapp, telegram });
+    const socialLinks = await updateSocialLinks({ whatsapp, telegram, whatsappContactNumber });
     return NextResponse.json({ success: true, socialLinks });
   } catch (error) {
     console.error('Error saving social links:', error);

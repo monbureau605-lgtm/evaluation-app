@@ -69,7 +69,7 @@ export default function AdminView({
   const [activeCampaign, setActiveCampaign] = useState<Campaign | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string>('1');
   const [recentEvaluations, setRecentEvaluations] = useState<Evaluation[]>([]);
-  const [socialLinks, setSocialLinks] = useState({ whatsapp: '', telegram: '' });
+  const [socialLinks, setSocialLinks] = useState({ whatsapp: '', telegram: '', whatsappContactNumber: '' });
   const [savingSocialLinks, setSavingSocialLinks] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -168,7 +168,7 @@ export default function AdminView({
       const statsData = await statsRes.json();
       const campData = await campRes.json();
       const socialData = await socialRes.json();
-      if (socialData.success) setSocialLinks(socialData.socialLinks || { whatsapp: '', telegram: '' });
+      if (socialData.success) setSocialLinks(socialData.socialLinks || { whatsapp: '', telegram: '', whatsappContactNumber: '' });
 
       if (statsData.success) {
         setGlobalStats(statsData.globalStats);
@@ -991,9 +991,9 @@ export default function AdminView({
               <form onSubmit={handleSaveSocialLinks} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="mb-4">
                   <h3 className="text-base font-bold text-slate-900">{lang === 'ar' ? 'روابط مجموعات العروض' : 'Groupes pour recevoir les offres'}</h3>
-                  <p className="mt-1 text-xs text-slate-500">{lang === 'ar' ? 'أضف روابط الدعوة؛ ستظهر للزوار بعد إكمال التقييم.' : 'Ajoutez les invitations qui seront proposées aux visiteurs après leur évaluation. Laissez vide pour masquer un bouton.'}</p>
+                  <p className="mt-1 text-xs text-slate-500">{lang === 'ar' ? 'أضف روابط الدعوة ورقم التواصل؛ ستظهر للزوار بعد إكمال التقييم أو إبداء الاهتمام.' : 'Ajoutez les liens d’invitation et le numéro de contact. Le numéro servira au bouton WhatsApp après un clic sur « Ce produit m’intéresse ».'}</p>
                 </div>
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-3">
                   <label className="block text-xs font-semibold text-slate-700">
                     WhatsApp
                     <input type="url" inputMode="url" placeholder="https://chat.whatsapp.com/..." value={socialLinks.whatsapp} onChange={(event) => setSocialLinks((value) => ({ ...value, whatsapp: event.target.value }))} className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
@@ -1001,6 +1001,10 @@ export default function AdminView({
                   <label className="block text-xs font-semibold text-slate-700">
                     Telegram
                     <input type="url" inputMode="url" placeholder="https://t.me/..." value={socialLinks.telegram} onChange={(event) => setSocialLinks((value) => ({ ...value, telegram: event.target.value }))} className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-900 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" />
+                  </label>
+                  <label className="block text-xs font-semibold text-slate-700">
+                    {lang === 'ar' ? 'رقم واتساب للتواصل المباشر' : 'Numéro WhatsApp de contact'}
+                    <input type="tel" inputMode="tel" autoComplete="tel" placeholder="+212 6 12 34 56 78" value={socialLinks.whatsappContactNumber} onChange={(event) => setSocialLinks((value) => ({ ...value, whatsappContactNumber: event.target.value }))} className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
                   </label>
                 </div>
                 <button type="submit" disabled={savingSocialLinks} className="mt-4 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-indigo-700 disabled:cursor-wait disabled:opacity-60">

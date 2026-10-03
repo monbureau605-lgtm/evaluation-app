@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Star, CheckCircle, Search, AlertCircle, Loader2, Play, Film, ChevronDown, ChevronUp, Sliders, Heart } from 'lucide-react';
+import { Star, CheckCircle, Search, AlertCircle, Loader2, Play, Film, ChevronDown, ChevronUp, Sliders, Heart, MessageCircle } from 'lucide-react';
 import { Product } from '@/lib/types';
 import { Language, getTranslation } from '@/lib/i18n';
 
@@ -12,6 +12,7 @@ interface ProductCardProps {
   initialPrice?: number | string;
   isValidated?: boolean;
   participantSessionId: string;
+  whatsappContactNumber?: string;
   lang?: Language;
   onValidate: (data: {
     productId: string;
@@ -34,6 +35,7 @@ export default function ProductCard({
   initialPrice = '',
   isValidated = false,
   participantSessionId,
+  whatsappContactNumber = '',
   lang = 'fr',
   onValidate,
   onOpenZoom,
@@ -333,19 +335,33 @@ export default function ProductCard({
           {product.description}
         </p>
 
-        <button
-          type="button"
-          onClick={handleInterested}
-          disabled={interested || isSavingInterest}
-          aria-pressed={interested}
-          className={`mt-3 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition ${interested
-            ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-300'
-            : 'border-rose-200 bg-white text-rose-600 hover:bg-rose-50 active:scale-[0.99] dark:border-rose-900/60 dark:bg-slate-900 dark:text-rose-300 dark:hover:bg-rose-950/30'
-          } disabled:cursor-default`}
-        >
-          {isSavingInterest ? <Loader2 className="h-4 w-4 animate-spin" /> : <Heart className={`h-4 w-4 ${interested ? 'fill-current' : ''}`} />}
-          {interested ? t.interestRecorded : isSavingInterest ? t.savingInProgress : t.markInterested}
-        </button>
+        <div className="mt-3 flex items-stretch gap-2">
+          <button
+            type="button"
+            onClick={handleInterested}
+            disabled={interested || isSavingInterest}
+            aria-pressed={interested}
+            className={`inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition ${interested
+              ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-300'
+              : 'border-rose-200 bg-white text-rose-600 hover:bg-rose-50 active:scale-[0.99] dark:border-rose-900/60 dark:bg-slate-900 dark:text-rose-300 dark:hover:bg-rose-950/30'
+            } disabled:cursor-default`}
+          >
+            {isSavingInterest ? <Loader2 className="h-4 w-4 animate-spin" /> : <Heart className={`h-4 w-4 ${interested ? 'fill-current' : ''}`} />}
+            {interested ? t.interestRecorded : isSavingInterest ? t.savingInProgress : t.markInterested}
+          </button>
+          {interested && whatsappContactNumber && (
+            <a
+              href={`https://wa.me/${whatsappContactNumber}?text=${encodeURIComponent(lang === 'ar' ? `Ø£Ù‡ØªÙ… Ø¨Ù‡Ø°Ø§ Ø§Ù„Ù…Ù†ØªØ¬: ${product.name}` : `Bonjour, je suis intéressé(e) par le produit « ${product.name} ».`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={t.contactOnWhatsApp}
+              title={t.contactOnWhatsApp}
+              className="inline-flex min-h-10 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 transition hover:bg-emerald-100 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/60"
+            >
+              <MessageCircle className="h-5 w-5" />
+            </a>
+          )}
+        </div>
         {interestError && <p role="alert" className="mt-1 text-center text-[11px] font-medium text-red-600 dark:text-red-400">{t.interestSaveError}</p>}
 
         {/* Inputs Section */}

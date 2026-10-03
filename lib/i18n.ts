@@ -37,6 +37,7 @@ export interface Translations {
   interestRecorded: string;
   interestSaveError: string;
   interestedCount: string;
+  contactOnWhatsApp: string;
   savingInProgress: string;
   doubleClickZoom: string;
   mediaCountInfo: string;
@@ -111,6 +112,7 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     interestRecorded: 'Votre intérêt est enregistré',
     interestSaveError: 'Impossible d’enregistrer votre intérêt. Réessayez.',
     interestedCount: 'Intéressés',
+    contactOnWhatsApp: 'Nous contacter sur WhatsApp',
     doubleClickZoom: 'Double-cliquez pour zoomer',
     mediaCountInfo: '3 photos & 1 vidéo disponibles',
     fullscreen: 'Plein écran',
@@ -205,6 +207,7 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     interestRecorded: 'تم تسجيل اهتمامكم',
     interestSaveError: 'تعذر تسجيل اهتمامكم. حاولوا مرة أخرى.',
     interestedCount: 'المهتمون',
+    contactOnWhatsApp: 'تواصلوا معنا عبر واتساب',
     doubleClickZoom: 'انقر مرتين للتكبير',
     mediaCountInfo: '3 صور وفيديو متوفر للمعاينة',
     fullscreen: 'ملء الشاشة',

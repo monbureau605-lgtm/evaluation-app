@@ -43,7 +43,7 @@ export default function VisitorView({
   onToggleLang,
 }: VisitorViewProps) {
   const t = getTranslation(lang);
-  const [socialLinks, setSocialLinks] = useState({ whatsapp: '', telegram: '' });
+  const [socialLinks, setSocialLinks] = useState({ whatsapp: '', telegram: '', whatsappContactNumber: '' });
 
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -105,7 +105,7 @@ export default function VisitorView({
       const campData = await campRes.json();
       const prodData = await prodRes.json();
       const socialData = await socialRes.json();
-      if (socialData.success) setSocialLinks(socialData.socialLinks || { whatsapp: '', telegram: '' });
+      if (socialData.success) setSocialLinks({ whatsapp: '', telegram: '', whatsappContactNumber: '', ...socialData.socialLinks });
 
       let targetCamp = campData.activeCampaign;
       if (urlCid && campData.campaigns) {
@@ -500,6 +500,7 @@ export default function VisitorView({
                   currency={campaign?.currency || 'MAD'}
                   isValidated={isValidated}
                   participantSessionId={visitorId}
+                  whatsappContactNumber={socialLinks.whatsappContactNumber}
                   initialRating={userEval?.rating || 0}
                   initialPrice={userEval?.price || ''}
                   lang={lang}
