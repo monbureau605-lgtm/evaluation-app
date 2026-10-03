@@ -6,6 +6,8 @@ import {
   CheckCircle2,
   Lock,
   ArrowRight,
+  MessageCircle,
+  Send,
   ShieldCheck,
   HeartHandshake,
   Film,
@@ -41,6 +43,7 @@ export default function VisitorView({
   onToggleLang,
 }: VisitorViewProps) {
   const t = getTranslation(lang);
+  const [socialLinks, setSocialLinks] = useState({ whatsapp: '', telegram: '' });
 
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -92,13 +95,16 @@ export default function VisitorView({
       }
 
       // Load campaigns & products
-      const [campRes, prodRes] = await Promise.all([
+      const [campRes, prodRes, socialRes] = await Promise.all([
         fetch('/api/campaigns'),
         fetch(urlCid ? `/api/products?campaignId=${urlCid}` : '/api/products'),
+        fetch('/api/settings/social-links'),
       ]);
 
       const campData = await campRes.json();
       const prodData = await prodRes.json();
+      const socialData = await socialRes.json();
+      if (socialData.success) setSocialLinks(socialData.socialLinks || { whatsapp: '', telegram: '' });
 
       let targetCamp = campData.activeCampaign;
       if (urlCid && campData.campaigns) {
@@ -495,7 +501,7 @@ export default function VisitorView({
               {t.completedTitle}
             </h3>
             <p className="mx-auto mt-2 max-w-2xl text-sm text-emerald-800 dark:text-emerald-300 sm:text-base">
-              {t.completedDesc}
+              {t.joinOffersPrompt}
             </p>
 
             <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-4">
@@ -503,14 +509,30 @@ export default function VisitorView({
                 <HeartHandshake className="h-4 w-4 text-emerald-700 dark:text-emerald-400" />
                 {t.completedBadge} {visitorId}
               </div>
-              <button
-                type="button"
-                onClick={onOpenAdminLogin}
-                className="flex items-center gap-1.5 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-slate-800 px-4 py-2 text-xs font-bold text-emerald-800 dark:text-emerald-200 shadow-sm hover:bg-emerald-50 dark:hover:bg-slate-700 transition"
-              >
-                {t.viewStatsBtn}
-                <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
-              </button>
+              {socialLinks.whatsapp && (
+                <a
+                  href={socialLinks.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  {t.joinWhatsApp}
+                  <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
+                </a>
+              )}
+              {socialLinks.telegram && (
+                <a
+                  href={socialLinks.telegram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-sky-700"
+                >
+                  <Send className="h-4 w-4" />
+                  {t.joinTelegram}
+                  <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
+                </a>
+              )}
             </div>
           </div>
         )}

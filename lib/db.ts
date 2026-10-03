@@ -7,6 +7,7 @@ interface StoreData {
   evaluations: Evaluation[];
   invitations?: EmailInvitation[];
   invitationBatches?: InvitationBatch[];
+  socialLinks?: { whatsapp: string; telegram: string };
   // Baseline synthetic stats to enrich prototype historical volume
   baselineStats?: Record<string, {
     participants: number;
@@ -246,10 +247,23 @@ async function ensureStore(): Promise<StoreData> {
     campaigns: INITIAL_CAMPAIGNS,
     products: INITIAL_PRODUCTS,
     evaluations: [],
+    socialLinks: { whatsapp: '', telegram: '' },
     baselineStats: BASELINE_STATS,
   };
   await saveStore(freshStore);
   return freshStore;
+}
+
+export async function getSocialLinks(): Promise<{ whatsapp: string; telegram: string }> {
+  const store = await ensureStore();
+  return store.socialLinks || { whatsapp: '', telegram: '' };
+}
+
+export async function updateSocialLinks(links: { whatsapp: string; telegram: string }): Promise<{ whatsapp: string; telegram: string }> {
+  const store = await ensureStore();
+  store.socialLinks = links;
+  await saveStore(store);
+  return links;
 }
 
 async function saveStore(store: StoreData): Promise<void> {

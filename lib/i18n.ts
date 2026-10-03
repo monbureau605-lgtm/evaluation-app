@@ -41,7 +41,9 @@ export interface Translations {
   completedTitle: string;
   completedDesc: string;
   completedBadge: string;
-  viewStatsBtn: string;
+  joinOffersPrompt: string;
+  joinWhatsApp: string;
+  joinTelegram: string;
   darkMode: string;
   lightMode: string;
   language: string;
@@ -108,7 +110,9 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     completedTitle: 'Félicitations ! Vos évaluations sont bien enregistrées.',
     completedDesc: 'Vous avez validé l’intégralité des articles de cette campagne. Vos estimations précieuses permettent d’ajuster notre offre et nos prix de lancement.',
     completedBadge: 'Participation enregistrée sous',
-    viewStatsBtn: 'Accéder aux statistiques consolidées',
+    joinOffersPrompt: 'Recevez nos prochaines offres en rejoignant notre groupe WhatsApp ou Telegram.',
+    joinWhatsApp: 'Rejoindre le groupe WhatsApp',
+    joinTelegram: 'Rejoindre le groupe Telegram',
     darkMode: 'Mode sombre',
     lightMode: 'Mode clair',
     language: 'Langue',
@@ -196,7 +200,9 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     completedTitle: 'تهانينا! تم تسجيل كافة تقييماتكم بنجاح.',
     completedDesc: 'لقد قمتم بتقييم كافة قطع هذه الحملة. تقديراتكم القيّمة تساعدنا على ضبط تشكيلاتنا وأسعار الإطلاق بدقة.',
     completedBadge: 'المشاركة مسجلة برقم',
-    viewStatsBtn: 'عرض الإحصائيات الشاملة',
+    joinOffersPrompt: 'للتوصل بعروضنا القادمة، انضم إلى مجموعتنا على واتساب أو تيليجرام.',
+    joinWhatsApp: 'انضم إلى مجموعة واتساب',
+    joinTelegram: 'انضم إلى مجموعة تيليجرام',
     darkMode: 'الوضع الداكن',
     lightMode: 'الوضع الفاتح',
     language: 'اللغة',

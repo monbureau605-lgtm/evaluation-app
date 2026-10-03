@@ -69,6 +69,8 @@ export default function AdminView({
   const [activeCampaign, setActiveCampaign] = useState<Campaign | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string>('1');
   const [recentEvaluations, setRecentEvaluations] = useState<Evaluation[]>([]);
+  const [socialLinks, setSocialLinks] = useState({ whatsapp: '', telegram: '' });
+  const [savingSocialLinks, setSavingSocialLinks] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // QR Code & WhatsApp Counter Modal
@@ -157,13 +159,16 @@ export default function AdminView({
 
   const loadData = useCallback(async () => {
     try {
-      const [statsRes, campRes] = await Promise.all([
+      const [statsRes, campRes, socialRes] = await Promise.all([
         fetch('/api/stats'),
         fetch('/api/campaigns'),
+        fetch('/api/settings/social-links'),
       ]);
 
       const statsData = await statsRes.json();
       const campData = await campRes.json();
+      const socialData = await socialRes.json();
+      if (socialData.success) setSocialLinks(socialData.socialLinks || { whatsapp: '', telegram: '' });
 
       if (statsData.success) {
         setGlobalStats(statsData.globalStats);
@@ -184,6 +189,26 @@ export default function AdminView({
       setLoading(false);
     }
   }, [selectedProductId]);
+
+  const handleSaveSocialLinks = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSavingSocialLinks(true);
+    try {
+      const response = await fetch('/api/settings/social-links', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(socialLinks),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || 'Enregistrement impossible');
+      setSocialLinks(data.socialLinks);
+      notify('success', lang === 'ar' ? 'تم حفظ روابط المجموعات.' : 'Les liens des groupes ont été enregistrés.');
+    } catch (error) {
+      notify('error', error instanceof Error ? error.message : 'Enregistrement impossible');
+    } finally {
+      setSavingSocialLinks(false);
+    }
+  };
 
   useEffect(() => {
     let ignore = false;
@@ -962,6 +987,26 @@ export default function AdminView({
                   <p className="mt-1 text-xs text-slate-500">Estimation moyenne du catalogue</p>
                 </div>
               </div>
+
+              <form onSubmit={handleSaveSocialLinks} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-4">
+                  <h3 className="text-base font-bold text-slate-900">{lang === 'ar' ? 'روابط مجموعات العروض' : 'Groupes pour recevoir les offres'}</h3>
+                  <p className="mt-1 text-xs text-slate-500">{lang === 'ar' ? 'أضف روابط الدعوة؛ ستظهر للزوار بعد إكمال التقييم.' : 'Ajoutez les invitations qui seront proposées aux visiteurs après leur évaluation. Laissez vide pour masquer un bouton.'}</p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    WhatsApp
+                    <input type="url" inputMode="url" placeholder="https://chat.whatsapp.com/..." value={socialLinks.whatsapp} onChange={(event) => setSocialLinks((value) => ({ ...value, whatsapp: event.target.value }))} className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
+                  </label>
+                  <label className="block text-xs font-semibold text-slate-700">
+                    Telegram
+                    <input type="url" inputMode="url" placeholder="https://t.me/..." value={socialLinks.telegram} onChange={(event) => setSocialLinks((value) => ({ ...value, telegram: event.target.value }))} className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-900 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" />
+                  </label>
+                </div>
+                <button type="submit" disabled={savingSocialLinks} className="mt-4 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-indigo-700 disabled:cursor-wait disabled:opacity-60">
+                  {savingSocialLinks ? (lang === 'ar' ? 'جارٍ الحفظ…' : 'Enregistrement…') : (lang === 'ar' ? 'حفظ الروابط' : 'Enregistrer les liens')}
+                </button>
+              </form>
 
               {/* Callout Banner: Import & Invite by Email */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl border border-indigo-200/90 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 p-6 text-white shadow-lg shadow-indigo-100">
